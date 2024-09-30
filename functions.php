@@ -93,3 +93,43 @@ function add_one_click_checkout_setting($settings) {
     return $settings;
 }
 
+// Redirect users to the checkout page if One-Click Checkout is enabled and they are logged in
+add_filter('woocommerce_add_to_cart_redirect', 'one_click_checkout_redirect');
+function one_click_checkout_redirect($url) {
+    // Check if One-Click Checkout is enabled
+    if ('yes' === get_option('enable_one_click_checkout') && is_user_logged_in()) {
+        // Skip cart page and go directly to the checkout page
+        $checkout_url = wc_get_checkout_url();
+        return $checkout_url;
+    }
+
+    return $url;
+}
+
+// Pre-fill checkout form for returning customers if One-Click Checkout is enabled
+add_filter('woocommerce_checkout_fields', 'prefill_checkout_fields_for_returning_customers');
+function prefill_checkout_fields_for_returning_customers($fields) {
+    if ('yes' === get_option('enable_one_click_checkout') && is_user_logged_in()) {
+        $current_user = wp_get_current_user();
+        
+        // Pre-fill billing fields with user data
+        $fields['billing']['billing_first_name']['default'] = $current_user->billing_first_name;
+        $fields['billing']['billing_last_name']['default'] = $current_user->billing_last_name;
+        $fields['billing']['billing_email']['default'] = $current_user->user_email;
+        $fields['billing']['billing_phone']['default'] = $current_user->billing_phone;
+        $fields['billing']['billing_address_1']['default'] = $current_user->billing_address_1;
+        $fields['billing']['billing_city']['default'] = $current_user->billing_city;
+        $fields['billing']['billing_postcode']['default'] = $current_user->billing_postcode;
+        $fields['billing']['billing_country']['default'] = $current_user->billing_country;
+
+        // Pre-fill shipping fields if needed (optional)
+        // $fields['shipping']['shipping_first_name']['default'] = $current_user->shipping_first_name;
+        // $fields['shipping']['shipping_last_name']['default'] = $current_user->shipping_last_name;
+        // $fields['shipping']['shipping_address_1']['default'] = $current_user->shipping_address_1;
+        // $fields['shipping']['shipping_city']['default'] = $current_user->shipping_city;
+        // $fields['shipping']['shipping_postcode']['default'] = $current_user->shipping_postcode;
+        // $fields['shipping']['shipping_country']['default'] = $current_user->shipping_country;
+    }
+
+    return $fields;
+}
