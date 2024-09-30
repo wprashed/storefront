@@ -69,3 +69,27 @@ if ( version_compare( get_bloginfo( 'version' ), '4.7.3', '>=' ) && ( is_admin()
  * Note: Do not add any custom code here. Please use a custom plugin so that your customizations aren't lost during updates.
  * https://github.com/woocommerce/theme-customisations
  */
+
+ // Add a new setting field for One-Click Checkout in WooCommerce settings
+add_filter('woocommerce_general_settings', 'add_one_click_checkout_setting');
+function add_one_click_checkout_setting($settings) {
+    $settings[] = array(
+        'name'     => __('One-Click Checkout', 'your-text-domain'),
+        'type'     => 'title',
+        'desc'     => __('Enable One-Click Checkout for returning customers.', 'your-text-domain'),
+        'id'       => 'one_click_checkout_title'
+    );
+
+    $settings[] = array(
+        'name'     => __('Enable One-Click Checkout', 'your-text-domain'),
+        'id'       => 'enable_one_click_checkout',
+        'type'     => 'checkbox',
+        'desc'     => __('Enable the One-Click Checkout feature.', 'your-text-domain'),
+        'default'  => 'no',
+    );
+
+    $settings[] = array('type' => 'sectionend', 'id' => 'one_click_checkout_title');
+
+    return $settings;
+}
+
